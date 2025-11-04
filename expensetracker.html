@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+       <title> Expense Tracker </title>
+    </head>
+    <body>
+        <label for="exp">Expense amount:</label>
+        <input id="exp" type="text"/><br><br>
+        <label for="desc">Expense description:</label>
+        <input id="desc" type="text"/><br><br>
+        <label for="cat">Expense Category:</label>
+        <select id="cat">
+            <option value="entertainment">Entertainment</option>
+            <option value="health">Health</option>
+            <option value="education">Education</option>
+            <option value="recreational">Recreational</option>
+        </select><br><br>
+        <button onclick="store()">Save</button><br><br>
+
+        <div id="detaildisplay"></div>
+
+        <script type="text/javascript">
+            window.onload =function(){
+                let savedetails=Object.keys(localStorage).map((k)=>{
+                    return{
+                        key:k,
+                        data:JSON.parse(localStorage.getItem(k))
+                    }
+                })
+            
+            displaydetails(savedetails);
+            };
+            function store(){
+                let amount=document.getElementById('exp').value;
+                let description=document.getElementById('desc').value;
+                let Category=document.getElementById('cat').value;
+                let newuser={
+                    amount:amount,
+                    description:description,
+                    Category:Category,
+                }
+                let userkey="user_"+Date.now();
+                let userserialized=JSON.stringify(newuser);
+                localStorage.setItem(userkey,userserialized);
+                let savedetails=Object.keys(localStorage).map((k)=>{
+                    return{
+                        key:k,
+                        data:JSON.parse(localStorage.getItem(k))
+                    }
+                });
+                displaydetails(savedetails);
+                document.getElementById("exp").value = "";
+                document.getElementById("desc").value = "";
+                document.getElementById("cat").value = "";
+            }
+            function deleteitem(key){
+                localStorage.removeItem(key);
+                let savedetails=Object.keys(localStorage).map((k)=>{
+                    return{
+                        key:k,
+                        data:JSON.parse(localStorage.getItem(k))
+                    }
+                });
+                displaydetails(savedetails);
+            }
+            function edititem(key){
+                let expense=JSON.parse(localStorage.getItem(key));
+                 document.getElementById("exp").value = expense.amount;
+                 document.getElementById("desc").value = expense.description;
+                 document.getElementById("cat").value = expense.Category;
+                 localStorage.removeItem(key);
+                  let savedetails=Object.keys(localStorage).map((k)=>{
+                    return{
+                        key:k,
+                        data:JSON.parse(localStorage.getItem(k))
+                    }
+                });
+                displaydetails(savedetails);
+
+
+}          
+                  displaydetails=function(savedetails){
+                    let display=document.getElementById("detaildisplay");
+                    display.innerHTML="<h2>Stored Expense</h2>"
+                    if(savedetails && savedetails.length>0){
+                    savedetails.forEach(ele => {
+                        display.innerHTML+=`<p>${ele.data.amount},${ele.data.description},${ele.data.Category}
+                                             <button onclick="deleteitem('${ele.key}')">Delete</button>
+                                             <button onclick="edititem('${ele.key}')">Edit</button>
+                                             </p>` ;       
+                                            
+
+                    });
+                }
+                else{
+                    display.innerHTML+=`<p>No expense stored</p>`;
+                }
+            }
+        </script>
+
+        </body>
+</html>
